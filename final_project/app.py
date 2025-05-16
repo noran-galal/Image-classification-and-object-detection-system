@@ -5,14 +5,28 @@ from PIL import Image
 from ultralytics import YOLO
 import tensorflow as tf
 import os
+import torch
+from pathlib import Path
 
 # Load models
 @st.cache_resource
 def load_models():
-    yolo_model = YOLO('yolov8_trained.pt')
-    resnet_model = tf.keras.models.load_model('best_resnet50_cifar10.keras')
+    # Get the directory where the script is located
+    script_dir = Path(__file__).parent
+    
+    # Construct absolute paths to the model files
+    yolo_path = script_dir / 'yolov8_trained.pt'
+    resnet_path = script_dir / 'best_resnet50_cifar10.keras'
+    
+    # Verify files exist before loading
+    if not yolo_path.exists():
+        raise FileNotFoundError(f"YOLO model file not found at: {yolo_path}")
+    if not resnet_path.exists():
+        raise FileNotFoundError(f"ResNet model file not found at: {resnet_path}")
+    
+    yolo_model = YOLO(str(yolo_path))
+    resnet_model = tf.keras.models.load_model(str(resnet_path))
     return yolo_model, resnet_model
-
 yolo_model, resnet_model = load_models()
 
 # CIFAR-10 class names
