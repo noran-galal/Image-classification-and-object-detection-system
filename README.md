@@ -1,4 +1,4 @@
-#Image Classification and Object Detection System
+**Image Classification and Object Detection System
 Table of Contents
 Introduction
 
