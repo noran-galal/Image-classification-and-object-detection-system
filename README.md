@@ -1,173 +1,165 @@
-**Image Classification and Object Detection System
-Table of Contents
-Introduction
+# Image Classification and Object Detection System
 
-System Overview
+## Table of Contents
+- [Introduction](#introduction)
+- [System Overview](#system-overview)
+- [Objectives](#objectives)
+- [System Architecture](#system-architecture)
+- [Functional Requirements](#functional-requirements)
+- [Non-Functional Requirements](#non-functional-requirements)
+- [Technologies Used](#technologies-used)
+- [Dataset](#dataset)
+- [Model Training](#model-training)
+- [Model Evaluation](#model-evaluation)
+- [Object Detection](#object-detection)
+- [User Interface](#user-interface)
+- [Deployment](#deployment)
+- [Future Work](#future-work)
+- [Team Members](#team-members)
 
-Objectives
+---
 
-System Architecture
+## Introduction
 
-Functional Requirements
+The **Image Classification and Object Detection System** is an intelligent solution that leverages deep learning techniques to classify image content and detect multiple objects in real-time. It has wide applicability across various domains such as surveillance, healthcare, retail, and autonomous vehicles. The system is designed to deliver high accuracy and efficiency, making it suitable for real-world deployment.
 
-Non-Functional Requirements
+---
 
-Technologies Used
+## System Overview
 
-Dataset
+The system performs two primary functions:
 
-Model Training
+- **Image Classification**: Assigns a label to an image based on its visual content.
+- **Object Detection**: Identifies and localizes multiple objects within an image using bounding boxes.
 
-Model Evaluation
+The pipeline includes modules for preprocessing, model training, inference, and a user-facing graphical interface.
 
-Object Detection
+---
 
-User Interface
+## Objectives
 
-Deployment
+- Develop a robust system for image classification and object detection.
+- Utilize transfer learning with pre-trained deep learning models.
+- Design an intuitive graphical user interface (GUI) for user interaction.
+- Enable real-time predictions through efficient deployment.
 
-Future Work
+---
 
-Team Members
+## System Architecture
 
-Introduction
-The Image Classification and Object Detection System is designed to analyze images and identify objects within them. This project involves building a robust AI system that uses deep learning models to classify images and detect multiple objects in real time. It is useful in a wide range of applications including surveillance, medical diagnostics, autonomous driving, and more.
+1. **Input Layer**: Accepts uploaded image files from users.
+2. **Preprocessing Module**: Resizes and normalizes input images for consistency.
+3. **Feature Extraction**: Utilizes convolutional neural networks (CNNs) to extract key features.
+4. **Classification / Detection Heads**:
+   - **Classification Head**: Outputs a class label.
+   - **Detection Head**: Outputs object classes and bounding box coordinates.
+5. **Output Layer**: Displays classification results or annotated images with bounding boxes.
 
-System Overview
-This system performs two primary tasks:
+---
 
-Image Classification: Assigning labels to images based on their content.
+## Functional Requirements
 
-Object Detection: Identifying and localizing objects within an image using bounding boxes.
+- Upload and preview images via GUI.
+- Perform image classification and display results.
+- Perform object detection with bounding boxes.
+- Present clear and interactive results to users.
 
-The architecture includes data preprocessing, model training, inference, and user interaction through a graphical interface.
+---
 
-Objectives
-Develop a deep learning-based system for image classification and object detection.
+## Non-Functional Requirements
 
-Use transfer learning to improve performance with pre-trained models.
+- High precision and recall in classification and detection.
+- Real-time inference with minimal latency.
+- User-friendly and responsive GUI.
+- Modular, maintainable, and scalable codebase.
 
-Implement a user-friendly GUI for image uploads and result display.
+---
 
-Enable deployment for real-time inference on new images.
+## Technologies Used
 
-System Architecture
-Input Layer: Accepts images from the user.
+- **Programming Language**: Python
+- **Deep Learning Frameworks**: TensorFlow, Keras, PyTorch
+- **Object Detection Models**: YOLOv5, Faster R-CNN
+- **GUI Frameworks**: Tkinter, PyQt
+- **Development Tools**: Jupyter Notebook, Visual Studio Code
+- **Version Control**: Git, GitHub
 
-Preprocessing Module: Resizes and normalizes the images.
+---
 
-Feature Extraction: Uses CNN-based models to extract image features.
+## Dataset
 
-Classification/Detection Head:
+- Public datasets such as **ImageNet**, **COCO**, and **Pascal VOC** were used.
+- Images were manually labeled and preprocessed to match model input specifications.
 
-For classification, outputs a class label.
+---
 
-For detection, returns object classes with bounding boxes.
+## Model Training
 
-Output Layer: Displays classification label or detection results to the user.
+- **Transfer Learning**: Leveraged pre-trained models (e.g., ResNet, YOLOv5) for faster convergence and improved accuracy.
+- **Fine-Tuning**: Conducted on domain-specific data to enhance performance.
+- **Acceleration**: Training was executed on GPUs to speed up convergence.
+- **Loss Functions**:
+  - Classification: Categorical Cross-Entropy
+  - Detection: Intersection-over-Union (IoU), classification loss, and bounding box regression loss
 
-Functional Requirements
-Upload image via GUI.
+---
 
-Perform classification and display label.
+## Model Evaluation
 
-Perform object detection and draw bounding boxes.
+- **Classification Metrics**:
+  - Accuracy
+  - Precision
+  - Recall
+  - F1-Score
+- **Detection Metrics**:
+  - Mean Average Precision (mAP)
+- Visual analysis via confusion matrices and ROC curves was conducted to evaluate performance.
 
-Display inference results clearly to the user.
+---
 
-Non-Functional Requirements
-High accuracy and precision in classification and detection.
+## Object Detection
 
-Real-time inference.
+- Implemented **YOLOv5** and **Faster R-CNN** models for detection tasks.
+- Bounding boxes include class names and confidence scores.
+- Tested with both static images and real-time webcam input to ensure performance consistency.
 
-Intuitive and responsive user interface.
+---
 
-Scalable and modular code structure.
+## User Interface
 
-Technologies Used
-Programming Language: Python
+- A lightweight GUI allows users to:
+  - Upload image files.
+  - View classification labels and detection annotations.
+  - Receive instant feedback with results displayed on-screen.
+- Designed with ease-of-use and accessibility in mind.
 
-Deep Learning Libraries: TensorFlow / Keras / PyTorch
+---
 
-Object Detection Models: YOLO, Faster R-CNN
+## Deployment
 
-GUI Framework: Tkinter / PyQt
+- Supports deployment as:
+  - **Standalone Application** (via PyInstaller)
+  - **Web Application** (via Flask or Streamlit)
+- Can be hosted on platforms such as **Heroku**, **AWS**, or **Azure** for cloud-based inference.
 
-IDE: Jupyter Notebook / VS Code
+---
 
-Version Control: Git, GitHub
+## Future Work
 
-Dataset
-Public datasets such as ImageNet, COCO, or Pascal VOC were used for training.
+- Extend to support **video input** and real-time **object tracking**.
+- Integrate with **cloud storage** and data pipelines for scalable dataset management.
+- Explore **mobile deployment** using TensorFlow Lite or ONNX.
+- Enhance accuracy through advanced **hyperparameter tuning** and **data augmentation**.
 
-Images were labeled and preprocessed to fit the input requirements of the models.
+---
 
-Model Training
-Transfer learning applied on pre-trained models (e.g., ResNet, YOLOv5).
+## Team Members
 
-Fine-tuning performed with labeled data.
+- Nour Ahmed  
+- Mohamed Nagi  
+- Menna  
+- Bola Hosny  
+- Noran Galal  
 
-Models trained using GPU acceleration for faster convergence.
-
-Loss functions:
-
-Classification: Cross-entropy loss
-
-Detection: IoU, classification loss, and bounding box regression loss
-
-Model Evaluation
-Metrics used:
-
-Accuracy (for classification)
-
-Precision, Recall, F1 Score
-
-mAP (mean Average Precision) for detection
-
-Confusion matrices and ROC curves plotted for better analysis.
-
-Object Detection
-Implemented YOLOv5 and/or Faster R-CNN for high-speed and accurate detection.
-
-Bounding boxes drawn on detected objects with class labels and confidence scores.
-
-Real-time performance tested with webcam input.
-
-User Interface
-A simple GUI allows users to:
-
-Upload images
-
-View classification results
-
-View detected objects with bounding boxes
-
-Real-time feedback provided immediately after image input.
-
-Deployment
-Application can be deployed as a:
-
-Standalone executable (via PyInstaller)
-
-Web app (via Flask or Streamlit)
-
-Can be run locally or hosted on cloud platforms (e.g., Heroku, AWS)
-
-Future Work
-Support for video input and real-time object tracking.
-
-Integration with cloud storage for dataset scalability.
-
-Mobile deployment using TensorFlow Lite or ONNX.
-
-Improve model accuracy through hyperparameter tuning and data augmentation.
-
-Team Members
-[Team Member 1 Name]
-
-[Team Member 2 Name]
-
-[Team Member 3 Name]
-
-[Team Member 4 Name]
+---
 
