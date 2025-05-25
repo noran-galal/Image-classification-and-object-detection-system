@@ -1,85 +1,81 @@
+
 import streamlit as st
-import cv2
 import numpy as np
-from PIL import Image
+import cv2
 from ultralytics import YOLO
-import tensorflow as tf
+from tensorflow.keras.models import load_model
+from PIL import Image
+import tempfile
 import os
-import torch
-from pathlib import Path
 
 # Load models
 @st.cache_resource
 def load_models():
-    # Get the directory where the script is located
-    script_dir = Path(__file__).parent
-    
-    # Construct absolute paths to the model files
-    yolo_path = script_dir / 'yolov8_trained.pt'
-    resnet_path = script_dir / 'best_resnet50_cifar10.keras'
-    
-    # Verify files exist before loading
-    if not yolo_path.exists():
-        raise FileNotFoundError(f"YOLO model file not found at: {yolo_path}")
-    if not resnet_path.exists():
-        raise FileNotFoundError(f"ResNet model file not found at: {resnet_path}")
-    
-    yolo_model = YOLO(str(yolo_path))
-    resnet_model = tf.keras.models.load_model(str(resnet_path))
-    return yolo_model, resnet_model
+    yolo = YOLO("models/yolov8.pt")
+    resnet = load_model("models/resnet50.h5")
+    return yolo, resnet
+
 yolo_model, resnet_model = load_models()
 
-# CIFAR-10 class names
+# CIFAR-10 class labels
 class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
                'dog', 'frog', 'horse', 'ship', 'truck']
 
-# Streamlit app
-st.title("Object Detection and Image Classification App")
-st.write("Upload an image and choose a task to perform: Object Detection (YOLOv8), Image Classification (ResNet50), or Both.")
+# Streamlit UI
+st.set_page_config(page_title="Object Detection & Classification", layout="wide")
+st.title("🧠 Integrated Object Detection and Classification System")
+st.write("Upload an image to detect and classify objects using YOLOv8 and ResNet50.")
 
-# Task selection
-task = st.radio("Select Task:", ["Object Detection", "Image Classification", "Both"], index=2)
-
-# File uploader
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("Choose an image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    # Read and display the image
-    image = Image.open(uploaded_file)
-    st.image(image, caption='Uploaded Image', use_column_width=True)
-    
-    # Convert PIL image to OpenCV and NumPy formats
-    img_array = np.array(image)
-    img_bgr = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+    image = Image.open(uploaded_file).convert("RGB")
+    image_np = np.array(image)
 
-    # Object Detection with YOLOv8
-    if task in ["Object Detection", "Both"]:
-        st.subheader("Object Detection Results (YOLOv8)")
-        results = yolo_model.predict(source=img_array, save=False, conf=0.25)
-        
-        # Display detected objects
-        detected_img = results[0].plot()  # Plot bounding boxes
-        detected_img_rgb = cv2.cvtColor(detected_img, cv2.COLOR_BGR2RGB)
-        st.image(detected_img_rgb, caption='Detected Objects', use_column_width=True)
-        
-        # Extract detected class names
-        detected_classes = [yolo_model.names[int(cls)] for cls in results[0].boxes.cls]
-        st.write("Detected Objects:", ", ".join(detected_classes) if detected_classes else "None")
-    
-    # Image Classification with ResNet50
-    if task in ["Image Classification", "Both"]:
-        st.subheader("Image Classification Results (ResNet50)")
-        # Resize image to 32x32 for ResNet50
-        img_resized = cv2.resize(img_array, (32, 32))
-        img_normalized = img_resized / 255.0
-        img_input = np.expand_dims(img_normalized, axis=0)
-        
-        # Predict
-        pred_probs = resnet_model.predict(img_input)
-        predicted_class = np.argmax(pred_probs, axis=1)[0]
-        predicted_label = class_names[predicted_class]
-        confidence = pred_probs[0][predicted_class]
-        
-        st.write(f"Predicted Class: {predicted_label}")
-        st.write(f"Confidence: {confidence:.4f}")
+    # Save the uploaded image temporarily and detect
+    with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as temp:
+        image.save(temp.name)
+        results = yolo_model(temp.name)[0]
 
+    boxes = results.boxes.xyxy.cpu().numpy()
+    annotated = image_np.copy()
+
+    st.subheader("🔍 Detection and Classification Results")
+    col1, col2 = st.columns([2, 1])
+
+    with col1:
+        for box in boxes:
+            x1, y1, x2, y2 = map(int, box[:4])
+            crop = image_np[y1:y2, x1:x2]
+            if crop.size == 0:
+                continue
+            crop_resized = cv2.resize(crop, (32, 32))
+            crop_normalized = crop_resized / 255.0
+            crop_input = np.expand_dims(crop_normalized, axis=0)
+
+            preds = resnet_model.predict(crop_input, verbose=0)
+            class_idx = np.argmax(preds)
+            label = class_names[class_idx]
+            confidence = float(np.max(preds))
+
+            cv2.rectangle(annotated, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.putText(annotated, f"{label} ({confidence:.2f})", (x1, y1 - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+
+        st.image(annotated, caption="Detected and Classified Objects", use_column_width=True)
+
+    with col2:
+        st.info("Detected Object Summary")
+        for box in boxes:
+            x1, y1, x2, y2 = map(int, box[:4])
+            crop = image_np[y1:y2, x1:x2]
+            if crop.size == 0:
+                continue
+            crop_resized = cv2.resize(crop, (32, 32))
+            crop_normalized = crop_resized / 255.0
+            crop_input = np.expand_dims(crop_normalized, axis=0)
+            preds = resnet_model.predict(crop_input, verbose=0)
+            class_idx = np.argmax(preds)
+            label = class_names[class_idx]
+            confidence = float(np.max(preds))
+            st.write(f"📦 **{label}** - Confidence: {confidence:.2f}")
